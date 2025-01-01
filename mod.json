@@ -8,6 +8,14 @@
 	},
 	"tags": ["joke"],
 	"id": "viper.redashupdate",
+	],
+	"dependencies": [
+        {
+            "id": "geode.node-ids",
+            "version": ">=v1.8.1",
+            "importance": "required"
+        }
+	],
 	"name": "Redash update",
 	"version": "v1.0.0",
 	"developer": "Viper",
