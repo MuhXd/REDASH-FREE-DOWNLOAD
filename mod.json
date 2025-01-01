@@ -8,7 +8,6 @@
 	},
 	"tags": ["joke"],
 	"id": "viper.redashupdate",
-	],
 	"dependencies": [
         {
             "id": "geode.node-ids",
