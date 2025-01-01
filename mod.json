@@ -1,0 +1,15 @@
+{
+	"geode": "4.1.1",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"tags": ["joke"],
+	"id": "viper.redashupdate",
+	"name": "Redash update",
+	"version": "v1.0.0",
+	"developer": "Viper",
+	"description": "This is redash for the playlayer!"
+}
