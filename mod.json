@@ -16,7 +16,7 @@
         }
 	],
 	"name": "Redash update",
-	"version": "v1.0.0",
+	"version": "v1.0.1",
 	"developer": "Viper",
 	"description": "This is redash for the playlayer!"
 }

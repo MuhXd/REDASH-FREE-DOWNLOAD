@@ -8,6 +8,7 @@
 #include <Geode/modify/CreatorLayer.hpp>
 #include <Geode/modify/SecretRewardsLayer.hpp>
 #include <Geode/modify/GauntletSelectLayer.hpp>
+#define UIHIDE(x,id) if (auto xd = x->getChildByID(id)) { xd->setVisible(false); }; 
 static bool appliedPatch = false;
 using namespace geode::prelude;
 class $modify(CreatorLayer) {
@@ -80,14 +81,12 @@ class $modify(FixedPlayLayer,PlayLayer) {
 			return false;
 		}
 		auto creatorLayer = CreatorLayer::create();
-		if (creatorLayer->getChildByID("swelvy-background")) {
-			creatorLayer->getChildByID("swelvy-background")->setVisible(false);
-		}
-		if (auto bg = creatorLayer->getChildByID("background")){
-			bg->setVisible(false);
-		}
+		UIHIDE(creatorLayer,"swelvy-background")
+		UIHIDE(creatorLayer,"background")
+		UIHIDE(creatorLayer,"ninsam.day_and_night_system/Events")
 		creatorLayer->setKeyboardEnabled(false);
 		creatorLayer->setZOrder(4);
+		//creatorLayer->registerScriptTouchHandler(1,true,1200,false);
 		this->addChild(creatorLayer);
 	
 		return true;
