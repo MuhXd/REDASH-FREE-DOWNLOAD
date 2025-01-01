@@ -74,12 +74,24 @@ class $modify(SecretRewardsLayer) {
 		GameManager::get()->safePopScene();
 	};
 };
-
+int stack = 0;
 class $modify(FixedPlayLayer,PlayLayer) {
+	void onQuit() {
+		PlayLayer::onQuit();
+		Loader::get()->queueInMainThread([=] {
+			if (stack == 1) {
+				this->release();
+				GameManager::sharedState()->m_playLayer = nullptr;
+				GameManager::get()->m_gameLayer = nullptr;
+				stack = 0;
+			};
+		});
+	};
 	 bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
 		if (!PlayLayer::init(level,useReplay,dontCreateObjects)) {
 			return false;
 		}
+		//this->m_fields->m_Scenefix = cocos2d::CCScene::get();
 		auto creatorLayer = CreatorLayer::create();
 		UIHIDE(creatorLayer,"swelvy-background")
 		UIHIDE(creatorLayer,"background")
@@ -122,36 +134,40 @@ class $modify(FixedPlayLayer,PlayLayer) {
 	}
 
 };
-
-class $modify(LevelInfoLayer) {
-	void showError(const std::string& s) {
-		FLAlertLayer::create("Error", s, "OK")->show();
-	}
-	void onPlay(CCObject* s) {
-		if (PlayLayer::get()) return showError("Can't open level while already in another level");
-		LevelInfoLayer::onPlay(s);
-	}
-	void tryCloneLevel(CCObject* s) {
-		if (PlayLayer::get()) return showError("Can't clone level while already in another level");
-		LevelInfoLayer::tryCloneLevel(s);
-	}
-};
-
 class $modify(CCDirector) { 
     static void onModify(auto& self) { 
         (void)self.setHookPriority("CCDirector::willSwitchToScene", 100); 
     } 
     void willSwitchToScene(CCScene* scene) { 
-		if (PlayLayer* p = PlayLayer::get()) {
-			p->pauseGame(true);
+		if (PlayLayer* playerlayr = scene->getChildByType<PlayLayer>(0)) {
+			if (PlayLayer::get() != playerlayr) {
+				if ( PlayLayer::get() != nullptr ) {
+					PlayLayer::get()->release();
+				}
+				stack-=1;
+				GameManager::sharedState()->m_playLayer = playerlayr;
+				GameManager::get()->m_gameLayer = playerlayr;
+				playerlayr->pauseGame(true);
+			}
+			if (!playerlayr->getUserObject("addedToStack"_spr)) {
+				playerlayr->setUserObject("addedToStack"_spr,CCBool::create(true));
+				playerlayr->retain();
+				stack+=1;
+			}
+			//log::debug("stack : {}",stack);
+		} else {
+			if (PlayLayer* p = PlayLayer::get()) {
+				p->pauseGame(true);
+			}
 		}
+	
         CCDirector::willSwitchToScene(scene); 
     }       
 };
 
 class $modify(MyCCLayer, CCLayer){
 	void onEnter(){
-		if(reinterpret_cast<void*>(PlayLayer::get()) == reinterpret_cast<void*>(this)){
+		if(typeinfo_cast<PlayLayer*>(this) && this->getUserObject("addedToStack"_spr)){
 				auto pl = reinterpret_cast<FixedPlayLayer*>(static_cast<CCLayer*>(this));
 				pl->onEnterH();
 		} else {
